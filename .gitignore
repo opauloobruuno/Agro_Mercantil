@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Scrapy
+.scrapy/
+httpcache/
+
+# Dados gerados localmente (opcional: descomente se não quiser versionar exports)
+# data/raw/*.html
+# data/raw/*.csv
+# data/raw/*.json
