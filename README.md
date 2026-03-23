@@ -11,7 +11,7 @@ Projeto para coletar e preparar dados de precos agropecuarios (serie historica) 
 - `data/raw/` -> arquivos originais coletados (ex.: `conab_page.html`, `conab_raw.csv/json`)
 - `data/processed/` -> dados intermediarios tratados (a definir)
 - `data/curated/` -> dados prontos para analise/consulta (a definir)
-- `sql/` -> scripts SQL (placeholder)
+- `sql/` -> scripts SQL (ex.: `sql/schema.sql` para criar o banco e `sql/queries_analise.sql` para queries/BI)
 - `src/` -> codigo Python do scraper (Scrapy)
   - `src/scraper/` -> projeto Scrapy (`scrapy.cfg` + spiders)
   - `src/scraper/agro_scraping/` -> itens, pipelines e spiders
@@ -139,4 +139,4 @@ Veja `docs/conab_spider_selectors.md` para:
 ## Status atual
 
 - Scraper Scrapy e scripts de apoio estao implementados.
-- `app/` e `tests/` e `sql/` estao como placeholders (sem codigo adicional ate o momento).
+- `app/` e `tests/` estao como placeholders (sem codigo adicional ate o momento).
