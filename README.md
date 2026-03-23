@@ -27,11 +27,13 @@ O arquivo `requirements.txt` cobre dependencias usadas nos scripts utilitarios:
 - `requests`
 - `beautifulsoup4`
 - `pandas`
+- `scrapy`
+- `psycopg2-binary`
 
-Para rodar o scraper Scrapy, e necessario instalar o Scrapy (nao esta listado em `requirements.txt`):
+Para instalar tudo:
 
 ```bash
-pip install scrapy
+pip install -r requirements.txt
 ```
 
 ## Como baixar e inspecionar a pagina (scripts)
@@ -43,6 +45,8 @@ Usa `requests` + `BeautifulSoup` para salvar:
 - `data/raw/conab_page.html`
 - `data/raw/conab_raw.csv`
 - `data/raw/conab_raw.json`
+
+O script cria `data/raw/` se ela nao existir.
 
 Comando:
 
@@ -79,7 +83,7 @@ python scripts/suggest_conab_selectors.py
 O spider `conab_prices` esta em `src/scraper/agro_scraping/spiders/conab_prices.py`.
 Ele faz:
 
-1. Comeca na pagina de "precosa agropecuarios - serie historica"
+1. Comeca na pagina de "precos agropecuarios - serie historica"
 2. Descobre links de commodities filtrando `href` por palavras-chave (soja, milho, trigo, etc.)
 3. Para cada commodity, percorre linhas de tabelas e tenta extrair:
    - `date` (com parse por multiplos formatos)
@@ -94,6 +98,8 @@ Rode a partir da pasta que contem `scrapy.cfg` (hoje: `src/scraper/`):
 cd src/scraper
 scrapy crawl conab_prices -O data/curated/conab_prices.json
 ```
+
+O `-O` exporta o feed para o arquivo informado; certifique-se de que `data/curated/` existe (o Scrapy nao cria diretorios intermediarios).
 
 O spider aceita parametro opcional `start_url`:
 
@@ -136,7 +142,37 @@ Veja `docs/conab_spider_selectors.md` para:
 - sugestoes de CSS/XPath para titulos, links, tabelas e formularios
 - exemplo de uso de `scrapy shell` para validar seletores
 
+## ETL para PostgreSQL (opcional)
+
+O script `scripts/etl_load.py.py` carrega os dados do CSV bruto para o PostgreSQL, usando o schema definido em `sql/schema.sql`.
+
+Pontos importantes:
+
+- O script procura `raw/conab_raw.csv` relativo ao diretorio de execucao.
+- O destino das tabelas e o schema `agromercado` (conforme `sql/schema.sql`).
+
+### Preparar o banco
+
+1. Crie um banco PostgreSQL (o script usa `agromercado_db` como exemplo em `DB_CONFIG`).
+2. Ajuste `DB_CONFIG` em `scripts/etl_load.py.py` (host/database/user/password).
+3. Execute `sql/schema.sql` para criar o schema `agromercado` e as tabelas.
+
+### Rodar o ETL
+
+Para reaproveitar o output do `scripts/download_conab_raw_tables.py` (que grava em `data/raw/conab_raw.csv`), rode o ETL a partir do diretorio `data/`:
+
+```bash
+cd data
+python ../scripts/etl_load.py.py
+```
+
+## SQL e analytics
+
+- `sql/schema.sql` cria o schema `agromercado` e tabelas (`commodities`, `regioes`, `cargas_dados`, `precos`), alem de inserir dados de exemplo ficticios.
+- `sql/queries_analise.sql` contem consultas de analise e tambem cria uma `VIEW materializada` chamada `agromercado.vw_dashboard_precos`.
+
 ## Status atual
 
 - Scraper Scrapy e scripts de apoio estao implementados.
+- `scripts/etl_load.py.py` (ETL) e os scripts SQL (`sql/schema.sql` e `sql/queries_analise.sql`) estao presentes.
 - `app/` e `tests/` estao como placeholders (sem codigo adicional ate o momento).
