@@ -15,7 +15,7 @@ Projeto para coletar e preparar dados de precos agropecuarios (serie historica) 
 - `src/` -> codigo Python do scraper (Scrapy)
   - `src/scraper/` -> projeto Scrapy (`scrapy.cfg` + spiders)
   - `src/scraper/agro_scraping/` -> itens, pipelines e spiders
-- `scripts/` -> utilitarios e modulos de apoio (`download_*.py`, `inspect_*`, `suggest_*`, `scraping.py`, `etl.py`, `analysis.py`)
+- `scripts/` -> utilitarios e modulos de apoio (`download_*.py`, `inspect_*`, `suggest_*`, `scraping.py`, `etl.py`, `analysis.py`, `eda_pandas.py`)
 - `docs/` -> documentacao dos seletores e heuristicas
 - `app/` -> aplicacao (`app/dashboard.py` para o dashboard Streamlit)
 - `tests/` -> testes automatizados (`test_*.py`)
@@ -31,6 +31,7 @@ O arquivo `requirements.txt` cobre dependencias usadas nos scripts utilitarios:
 - `psycopg2-binary`
 - `streamlit`
 - `plotly`
+- `matplotlib`
 - `pytest`
 
 Para instalar tudo:
@@ -181,6 +182,7 @@ O dashboard em Streamlit esta em `app/dashboard.py` e consulta o PostgreSQL para
 - Analise A: preco medio mensal por commodity com variacao mes a mes
 - Analise B: top 5 commodities por volume no periodo selecionado
 - Analise C: registros anomalos (negativos, fora de faixa e inconsistentes)
+- Filtros por produto, regiao e periodo
 
 ### Configurar conexao com o banco (variaveis de ambiente)
 
@@ -198,6 +200,31 @@ Com as dependencias instaladas e o banco populado:
 ```bash
 streamlit run app/dashboard.py
 ```
+
+## Analise exploratoria (Pandas/Matplotlib)
+
+Script:
+
+```bash
+python scripts/eda_pandas.py
+```
+
+Saidas geradas em `data/curated/eda/`:
+
+- `estatisticas_descritivas.csv`
+- `outliers_iqr.csv`
+- `boxplot_precos_por_commodity.png`
+- `histograma_precos.png`
+- `scatter_data_preco.png`
+
+## Documentacao final da avaliacao
+
+- `docs/avaliacao_final.md` consolida:
+  - aderencia aos itens da prova,
+  - justificativas de modelagem e indices,
+  - proposta de estrutura em S3,
+  - insights, aplicacoes e limitacoes,
+  - checklist de evidencias/prints (`docs/evidencias/`).
 
 ## Rodar testes
 
