@@ -6,4 +6,5 @@ scrapy
 psycopg2-binary
 streamlit
 plotly
+matplotlib
 pytest
