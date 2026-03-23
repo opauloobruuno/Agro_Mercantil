@@ -155,3 +155,91 @@ WHERE mes_referencia >= CURRENT_DATE - INTERVAL '3 months'
 ORDER BY mes_referencia DESC, ranking_volume
 LIMIT 10;
 
+-- --------------------------------------------------------------------
+-- Consulta (a): Preço Médio Mensal por Commodity com Variação Mês a Mês
+-- --------------------------------------------------------------------
+-- Análise de preço médio mensal por commodity com variação (usando LAG)
+WITH precos_mensais AS (
+    SELECT
+        c.nome AS commodity,
+        DATE_TRUNC('month', p.data_preco) AS mes_referencia,
+        ROUND(AVG(p.valor_preco)::NUMERIC, 2) AS preco_medio_mensal
+    FROM precos p
+    JOIN commodities c ON p.commodity_id = c.id
+    GROUP BY c.nome, mes_referencia
+)
+SELECT
+    commodity,
+    TO_CHAR(mes_referencia, 'YYYY-MM') AS mes_ano,
+    preco_medio_mensal,
+    LAG(preco_medio_mensal) OVER (PARTITION BY commodity ORDER BY mes_referencia) AS preco_anterior,
+    CASE
+        WHEN LAG(preco_medio_mensal) OVER (PARTITION BY commodity ORDER BY mes_referencia) IS NOT NULL THEN
+            ROUND(
+                (
+                    (preco_medio_mensal - LAG(preco_medio_mensal) OVER (PARTITION BY commodity ORDER BY mes_referencia))
+                    / LAG(preco_medio_mensal) OVER (PARTITION BY commodity ORDER BY mes_referencia)
+                ) * 100, 2
+            )
+        ELSE NULL
+    END AS variacao_percentual
+FROM precos_mensais
+ORDER BY commodity, mes_referencia;
+
+-- --------------------------------------------------------------------
+-- Consulta (b): Top 5 Produtos Mais Negociados no Último Ano
+-- --------------------------------------------------------------------
+-- Top 5 commodities mais negociadas no último ano (filtro por data, agrupado por volume de registros)
+SELECT
+    c.nome AS commodity,
+    COUNT(p.id) AS volume_negociado,  -- Métrica: número de registros (frequência de coletas/preços)
+    ROUND(AVG(p.valor_preco)::NUMERIC, 2) AS preco_medio_recente
+FROM precos p
+JOIN commodities c ON p.commodity_id = c.id
+WHERE p.data_preco >= CURRENT_DATE - INTERVAL '1 year'  -- Último ano a partir de 23/03/2026
+GROUP BY c.id, c.nome
+ORDER BY volume_negociado DESC
+LIMIT 5;
+
+-- --------------------------------------------------------------------
+-- Consulta (c): Registros Anômalos
+-- --------------------------------------------------------------------
+-- Detecção de anomalias: preços negativos, fora de faixa e inconsistentes
+WITH anomalias AS (
+    SELECT
+        p.id,
+        c.nome AS commodity,
+        r.nome AS regiao,
+        p.data_preco,
+        p.valor_preco,
+        p.url_fonte,
+        -- Regra 1: Preços negativos
+        CASE WHEN p.valor_preco < 0 THEN 'ANOMALIA_NEGATIVO' ELSE NULL END AS flag_negativo,
+        -- Regra 2: Fora de faixa (ex.: >3x desvio padrão da média por commodity/região)
+        CASE
+            WHEN ABS(p.valor_preco - AVG(p.valor_preco) OVER (PARTITION BY c.id, r.id)) >
+                 (3 * STDDEV(p.valor_preco) OVER (PARTITION BY c.id, r.id))
+            THEN 'ANOMALIA_FORA_FAIXA'
+            ELSE NULL
+        END AS flag_faixa,
+        -- Regra 3: Inconsistentes (ex.: data futura ou duplicata em data/região/commodity)
+        CASE
+            WHEN p.data_preco > CURRENT_DATE THEN 'ANOMALIA_DATA_FUTURA'
+            WHEN p.valor_preco IS NULL OR p.valor_preco = 0 THEN 'ANOMALIA_VALOR_NULO_ZERADO'
+            ELSE NULL
+        END AS flag_inconsistente
+    FROM precos p
+    JOIN commodities c ON p.commodity_id = c.id
+    JOIN regioes r ON p.regiao_id = r.id
+)
+SELECT
+    commodity,
+    regiao,
+    data_preco,
+    valor_preco,
+    url_fonte,
+    COALESCE(flag_negativo, flag_faixa, flag_inconsistente) AS tipo_anomalia
+FROM anomalias
+WHERE flag_negativo IS NOT NULL OR flag_faixa IS NOT NULL OR flag_inconsistente IS NOT NULL
+ORDER BY data_preco DESC;
+
