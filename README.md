@@ -1,4 +1,23 @@
+<div align="center">
+
 # Agro Mercantil
+
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python)](https://www.python.org/)
+[![Scrapy](https://img.shields.io/badge/Scrapy-Web%20Scraping-green?logo=scrapy)](https://scrapy.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?logo=pandas)](https://pandas.pydata.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-Scientific%20Computing-013243?logo=numpy)](https://numpy.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?logo=postgresql)](https://www.postgresql.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?logo=streamlit)](https://streamlit.io/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualização-11557C?logo=python)](https://matplotlib.org/)
+[![Plotly](https://img.shields.io/badge/Plotly-Interactive%20Charts-3F4F75?logo=plotly)](https://plotly.com/python/)
+[![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-HTML%20Parsing-orange)](https://www.crummy.com/software/BeautifulSoup/)
+[![Pytest](https://img.shields.io/badge/Pytest-Tests-0A9EDC?logo=pytest)](https://pytest.org/)
+[![Requests](https://img.shields.io/badge/Requests-HTTP%20Client-2B2B2B?logo=python)](https://requests.readthedocs.io/)
+[![Psycopg2](https://img.shields.io/badge/Psycopg2-PostgreSQL%20Adapter-336791?logo=postgresql)](https://www.psycopg.org/)
+
+</div>
+
+---
 
 Projeto para coletar e preparar dados de precos agropecuarios (serie historica) a partir do portal da Conab, com foco em:
 
