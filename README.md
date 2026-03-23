@@ -18,7 +18,7 @@ Projeto para coletar e preparar dados de precos agropecuarios (serie historica) 
 - `scripts/` -> utilitarios (baixar/inspecionar/sugerir seletores)
 - `docs/` -> documentacao dos seletores e heuristicas
 - `app/` -> aplicacao (placeholder; hoje esta vazio)
-- `tests/` -> testes unitarios (placeholder)
+- `tests/` -> testes e prototipos (inclui dashboard Streamlit e funcoes de analise/ETL de apoio)
 
 ## Requisitos
 
@@ -29,6 +29,9 @@ O arquivo `requirements.txt` cobre dependencias usadas nos scripts utilitarios:
 - `pandas`
 - `scrapy`
 - `psycopg2-binary`
+- `streamlit`
+- `plotly`
+- `pytest`
 
 Para instalar tudo:
 
@@ -171,8 +174,40 @@ python ../scripts/etl_load.py.py
 - `sql/schema.sql` cria o schema `agromercado` e tabelas (`commodities`, `regioes`, `cargas_dados`, `precos`), alem de inserir dados de exemplo ficticios.
 - `sql/queries_analise.sql` contem consultas de analise e tambem cria uma `VIEW materializada` chamada `agromercado.vw_dashboard_precos`.
 
+## Dashboard interativo (Streamlit)
+
+O dashboard em Streamlit esta em `tests/dashboard.py` e consulta o PostgreSQL para exibir:
+
+- Analise A: preco medio mensal por commodity com variacao mes a mes
+- Analise B: top 5 commodities por volume no periodo selecionado
+- Analise C: registros anomalos (negativos, fora de faixa e inconsistentes)
+
+### Configurar conexao com o banco (variaveis de ambiente)
+
+O dashboard le:
+
+- `DB_HOST` (default: `localhost`)
+- `DB_DATABASE` (default: `agromercado_db`)
+- `DB_USER` (default: `postgres`)
+- `DB_PASSWORD` (default: `sua_senha`)
+
+### Executar
+
+Com as dependencias instaladas e o banco populado:
+
+```bash
+streamlit run tests/dashboard.py
+```
+
+## Rodar testes
+
+```bash
+pytest -v
+```
+
 ## Status atual
 
 - Scraper Scrapy e scripts de apoio estao implementados.
 - `scripts/etl_load.py.py` (ETL) e os scripts SQL (`sql/schema.sql` e `sql/queries_analise.sql`) estao presentes.
-- `app/` e `tests/` estao como placeholders (sem codigo adicional ate o momento).
+- Dashboard Streamlit esta disponivel em `tests/dashboard.py`.
+- `app/` esta como placeholder (sem codigo adicional ate o momento).

@@ -41,6 +41,7 @@ JOIN regioes r ON p.regiao_id = r.id
 ORDER BY commodity, regiao, data_preco;
 
 -- 3) Top 5 Commodities Mais Negociadas (por volume de registros)
+-- Observação: esta versão considera todo o histórico.
 SELECT
     c.nome AS commodity,
     COUNT(p.id) AS total_registros,
@@ -51,8 +52,8 @@ GROUP BY c.id, c.nome
 ORDER BY total_registros DESC
 LIMIT 5;
 
--- 4) Detecção de Anomalias (preços > 20% acima/abaixo de média móvel aproximada)
--- Flag para outliers, útil para validação de dados.
+-- 4) Detecção de outliers (preços > 20% acima/abaixo de média móvel aproximada)
+-- Flag para possíveis outliers (comportamento estatístico), útil para validação.
 WITH media_movel AS (
     SELECT
         p.id,
@@ -204,7 +205,7 @@ LIMIT 5;
 -- --------------------------------------------------------------------
 -- Consulta (c): Registros Anômalos
 -- --------------------------------------------------------------------
--- Detecção de anomalias: preços negativos, fora de faixa e inconsistentes
+-- Detecção de anomalias de qualidade: preços negativos, fora de faixa e inconsistentes
 WITH anomalias AS (
     SELECT
         p.id,
