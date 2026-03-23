@@ -15,10 +15,10 @@ Projeto para coletar e preparar dados de precos agropecuarios (serie historica) 
 - `src/` -> codigo Python do scraper (Scrapy)
   - `src/scraper/` -> projeto Scrapy (`scrapy.cfg` + spiders)
   - `src/scraper/agro_scraping/` -> itens, pipelines e spiders
-- `scripts/` -> utilitarios (baixar/inspecionar/sugerir seletores)
+- `scripts/` -> utilitarios e modulos de apoio (`download_*.py`, `inspect_*`, `suggest_*`, `scraping.py`, `etl.py`, `analysis.py`)
 - `docs/` -> documentacao dos seletores e heuristicas
-- `app/` -> aplicacao (placeholder; hoje esta vazio)
-- `tests/` -> testes e prototipos (inclui dashboard Streamlit e funcoes de analise/ETL de apoio)
+- `app/` -> aplicacao (`app/dashboard.py` para o dashboard Streamlit)
+- `tests/` -> testes automatizados (`test_*.py`)
 
 ## Requisitos
 
@@ -176,7 +176,7 @@ python ../scripts/etl_load.py.py
 
 ## Dashboard interativo (Streamlit)
 
-O dashboard em Streamlit esta em `tests/dashboard.py` e consulta o PostgreSQL para exibir:
+O dashboard em Streamlit esta em `app/dashboard.py` e consulta o PostgreSQL para exibir:
 
 - Analise A: preco medio mensal por commodity com variacao mes a mes
 - Analise B: top 5 commodities por volume no periodo selecionado
@@ -196,7 +196,7 @@ O dashboard le:
 Com as dependencias instaladas e o banco populado:
 
 ```bash
-streamlit run tests/dashboard.py
+streamlit run app/dashboard.py
 ```
 
 ## Rodar testes
@@ -209,5 +209,5 @@ pytest -v
 
 - Scraper Scrapy e scripts de apoio estao implementados.
 - `scripts/etl_load.py.py` (ETL) e os scripts SQL (`sql/schema.sql` e `sql/queries_analise.sql`) estao presentes.
-- Dashboard Streamlit esta disponivel em `tests/dashboard.py`.
-- `app/` esta como placeholder (sem codigo adicional ate o momento).
+- Dashboard Streamlit esta disponivel em `app/dashboard.py`.
+- `tests/` contem os testes automatizados do projeto.

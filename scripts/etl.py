@@ -1,12 +1,13 @@
 import logging
-from typing import List
 
 import pandas as pd
 import psycopg2
 from psycopg2 import extras
-from pathlib import Path
 
-from scraping import ARQUIVO_CSV  # Importa do script anterior
+try:
+    from scripts.scraping import ARQUIVO_CSV
+except ImportError:
+    from scraping import ARQUIVO_CSV
 
 # Config DB (ajuste para seu ambiente)
 DB_CONFIG = {
@@ -20,9 +21,11 @@ DB_CONFIG = {
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def conectar_db() -> psycopg2.connection:
     """Conecta ao PostgreSQL."""
     return psycopg2.connect(**DB_CONFIG)
+
 
 def carregar_etl():
     """Carrega CSV bruto para SQL (normalização e inserção)."""
@@ -35,30 +38,35 @@ def carregar_etl():
         conn = conectar_db()
         cursor = conn.cursor()
 
-        # Assume schema já criado (de schema.sql)
         df = pd.read_csv(ARQUIVO_CSV)
+        df["commodity_padronizada"] = df["commodity_padronizada"].fillna(df["commodity"]).apply(
+            lambda x: x.title() if pd.notna(x) else None
+        )
+        df["regiao_padronizada"] = df["regiao_padronizada"].fillna(df["regiao"]).apply(
+            lambda x: x.title() if pd.notna(x) else None
+        )
 
-        # Padronização adicional (ex.: categorias)
-        df["commodity_padronizada"] = df["commodity_padronizada"].fillna(df["commodity"]).apply(lambda x: x.title() if pd.notna(x) else None)
-        df["regiao_padronizada"] = df["regiao_padronizada"].fillna(df["regiao"]).apply(lambda x: x.title() if pd.notna(x) else None)
-
-        # Inserção em lote (exemplo simplificado; adapte para suas tabelas)
-        dados = [(row["commodity_padronizada"], row["preco_limpo"], row["data"]) for _, row in df.iterrows() if pd.notna(row["preco_limpo"])]
+        dados = [
+            (row["commodity_padronizada"], row["preco_limpo"], row["data"])
+            for _, row in df.iterrows()
+            if pd.notna(row["preco_limpo"])
+        ]
         extras.execute_values(
             cursor,
-            "INSERT INTO agromercado.precos_raw (commodity, valor, data) VALUES %s ON CONFLICT DO NOTHING;",  # Tabela raw para teste
-            dados
+            "INSERT INTO agromercado.precos_raw (commodity, valor, data) VALUES %s ON CONFLICT DO NOTHING;",
+            dados,
         )
         conn.commit()
-        logger.info(f"ETL concluído: {len(dados)} registros inseridos.")
+        logger.info("ETL concluído: %s registros inseridos.", len(dados))
 
     except Exception as e:
-        logger.error(f"Erro no ETL: {e}")
+        logger.error("Erro no ETL: %s", e)
         if conn:
             conn.rollback()
     finally:
         if conn:
             conn.close()
+
 
 if __name__ == "__main__":
     carregar_etl()

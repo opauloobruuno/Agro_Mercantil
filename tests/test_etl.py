@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from etl import carregar_etl, conectar_db
+from scripts.etl import carregar_etl, conectar_db
 
 @patch('psycopg2.connect')
 def test_conectar_db(mock_connect):

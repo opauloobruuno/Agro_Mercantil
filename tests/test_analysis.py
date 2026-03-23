@@ -1,7 +1,11 @@
 import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from analysis import analise_a_preco_medio_mensal_variacao, analise_b_top5_produtos_ultimo_ano, analise_c_registros_anomalos
+from scripts.analysis import (
+    analise_a_preco_medio_mensal_variacao,
+    analise_b_top5_produtos_ultimo_ano,
+    analise_c_registros_anomalos,
+)
 
 @patch('psycopg2.connect')
 @patch('pandas.read_sql_query')

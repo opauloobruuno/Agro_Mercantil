@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
-from scraping import baixar_html, extrair_tabelas, padronizar_categoria, salvar_dados
+from scripts.scraping import baixar_html, extrair_tabelas, padronizar_categoria, salvar_dados
 
 @pytest.fixture
 def html_mock():

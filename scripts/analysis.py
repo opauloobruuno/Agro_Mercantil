@@ -1,6 +1,5 @@
-import psycopg2
-from typing import List, Dict
 import pandas as pd
+import psycopg2
 
 # Config DB (mesma do ETL)
 DB_CONFIG = {
@@ -11,8 +10,10 @@ DB_CONFIG = {
     "port": 5432,
 }
 
+
 def conectar_db():
     return psycopg2.connect(**DB_CONFIG)
+
 
 def analise_a_preco_medio_mensal_variacao() -> pd.DataFrame:
     """Análise A: Preço médio mensal por commodity com variação (LAG)."""
@@ -35,6 +36,7 @@ def analise_a_preco_medio_mensal_variacao() -> pd.DataFrame:
     conn.close()
     return df
 
+
 def analise_b_top5_produtos_ultimo_ano() -> pd.DataFrame:
     """Análise B: Top 5 produtos mais negociados (por volume de registros)."""
     conn = conectar_db()
@@ -48,6 +50,7 @@ def analise_b_top5_produtos_ultimo_ano() -> pd.DataFrame:
     df = pd.read_sql_query(query, conn)
     conn.close()
     return df
+
 
 def analise_c_registros_anomalos() -> pd.DataFrame:
     """Análise C: Detecção de anomalias (negativos, fora de faixa, inconsistentes)."""
@@ -68,6 +71,7 @@ def analise_c_registros_anomalos() -> pd.DataFrame:
     df = pd.read_sql_query(query, conn)
     conn.close()
     return df
+
 
 if __name__ == "__main__":
     print("Análise A:", analise_a_preco_medio_mensal_variacao())
